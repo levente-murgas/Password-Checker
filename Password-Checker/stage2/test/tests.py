@@ -14,14 +14,19 @@ class StageTest2(StageTest):
     short_pwds = ["123456", "qwerty", "qwertz", "notlong", "short"]
 
     @dynamic_test(data=valid_pwds)
-    def display_pwd_test(self, x):
+    def input_test(self, x):
         main = TestedProgram()
-        main.start().lower()
+        output = main.start().lower()
         output2 = main.execute(x)
 
-        if x not in output2:
-            return CheckResult.wrong("Your program should display the entered password, " +
-                                     "which is: \"" + x + "\". Meanwhile, your output is: " + output2)
+        expected_output = "You entered: " + x  # Replace with the exact string your program should output
+
+        if not output2:
+            return CheckResult.wrong("Your program's output is empty. It should display the entered password.")
+
+        if expected_output != output2.strip():
+            return CheckResult.wrong(
+                f"Your program should display '{expected_output}', but your output is: '{output2}'")
 
         return CheckResult.correct()
 
@@ -31,8 +36,12 @@ class StageTest2(StageTest):
         main.start().lower()
         output = main.execute(x)
 
-        if "Your password is too short. Please enter a password of at least 8 characters." not in output:
-            return CheckResult.wrong("The program did not warn about a short password.")
+        expected_output = "Your password is too short. Please enter a password of at least 8 characters."
+
+        warning = output.split("\n")[0]
+        if expected_output != warning.strip():
+            return CheckResult.wrong(f"The program did not warn about a short password. Your output was: "
+                                     f"{output}")
 
         return CheckResult.correct()
 
