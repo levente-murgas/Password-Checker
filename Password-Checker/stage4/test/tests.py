@@ -29,6 +29,23 @@ class StageTest4(StageTest):
         return CheckResult.correct()
 
     @dynamic_test(data=valid_pwds)
+    def hash_output_test(self, x):
+        main = TestedProgram()
+        main.start().lower()
+        output = main.execute(x).strip()
+
+        expected_hash = hashlib.sha1(x.encode()).hexdigest()
+
+        expected_output = "Your hashed password is: " + expected_hash
+
+        display_hash_output = output.split("\n")[0]
+
+        if expected_output != display_hash_output.strip():
+            return CheckResult.wrong("The program should output the hashed password.\n" +
+                                     "Expected: \"" + expected_output + "\".\n" +
+                                     "Got: \"" + display_hash_output + "\". ")
+        return CheckResult.correct()
+    @dynamic_test(data=valid_pwds)
     def test_api_request(self, x):
         main = TestedProgram()
         main.start().lower()

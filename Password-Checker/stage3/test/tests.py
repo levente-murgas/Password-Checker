@@ -33,15 +33,16 @@ class StageTest3(StageTest):
     def hash_output_test(self, x):
         main = TestedProgram()
         main.start().lower()
-        output = main.execute(x).lower().strip()
+        output = main.execute(x).strip()
 
         expected_hash = hashlib.sha1(x.encode()).hexdigest()
 
-        expected_output = "Your hashed password is: "
+        expected_output = "Your hashed password is: " + expected_hash
 
-        if expected_hash not in output:
-            return CheckResult.wrong("The program should output the hashed password. " +
-                                     "Expected: \"" + expected_hash + "\". Got: " + output)
+        if expected_output != output.strip():
+            return CheckResult.wrong("The program should output the hashed password.\n" +
+                                     "Expected: \"" + expected_output + "\".\n" +
+                                     "Got: \"" + output + "\". ")
         return CheckResult.correct()
 
 
