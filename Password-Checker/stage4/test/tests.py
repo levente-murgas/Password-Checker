@@ -13,6 +13,20 @@ class StageTest4(StageTest):
         return CheckResult.correct()
 
     valid_pwds = ["mypassword123", "youcantguessme", "abcdefgh", "validpwd"]
+    short_pwds = ["123456", "qwerty", "qwertz", "notlong", "short"]
+    @dynamic_test(data=short_pwds)
+    def short_pwd_length_check(self, x):
+        main = TestedProgram()
+        main.start().lower()
+        output = main.execute(x)
+
+        expected_output = "Your password is too short. Please enter a password of at least 8 characters."
+
+        warning = output.split("\n")[0]
+        if expected_output != warning.strip():
+            return CheckResult.wrong(f"The program did not warn about a short password.")
+
+        return CheckResult.correct()
 
     @dynamic_test(data=valid_pwds)
     def test_api_request(self, x):

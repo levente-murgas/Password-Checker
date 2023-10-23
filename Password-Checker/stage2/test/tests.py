@@ -40,8 +40,7 @@ class StageTest2(StageTest):
 
         warning = output.split("\n")[0]
         if expected_output != warning.strip():
-            return CheckResult.wrong(f"The program did not warn about a short password. Your output was: "
-                                     f"{output}")
+            return CheckResult.wrong(f"The program did not warn about a short password.")
 
         return CheckResult.correct()
 

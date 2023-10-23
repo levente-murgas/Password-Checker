@@ -18,12 +18,12 @@ class StageTest1(StageTest):
         output = main.start().lower()
         output2 = main.execute(x)
 
-        expected_output = "You entered: " + x + "\n"  # Replace with the exact string your program should output
+        expected_output = "You entered: " + x  # Replace with the exact string your program should output
 
         if not output2:
             return CheckResult.wrong("Your program's output is empty. It should display the entered password.")
 
-        if expected_output != output2:
+        if expected_output != output2.strip():
             return CheckResult.wrong(
                 f"Your program should display '{expected_output}', but your output is: '{output2}'")
 
