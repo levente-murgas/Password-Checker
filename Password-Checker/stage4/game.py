@@ -11,6 +11,5 @@ while len(password) < 8:
 print("Your hashed password is: " + encoded.hexdigest())
 print("Checking...")
 response = requests.get("https://api.pwnedpasswords.com/range/" + encoded.hexdigest()[0:5])
-print("A request was sent to " +
-      "https://api.pwnedpasswords.com/range/" + encoded.hexdigest()[0:5] +
-      " endpoint, awaiting response...")
+lines = response.text.splitlines()
+print("The request returned " + str(len(lines)) + " possibly matching passwords.")

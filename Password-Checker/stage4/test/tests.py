@@ -23,8 +23,8 @@ class StageTest4(StageTest):
 
         expected_output = "Your password is too short. Please enter a password of at least 8 characters."
 
-        warning = output.split("\n")[0]
-        if expected_output != warning.strip():
+        warning = output.split("\n")[0].strip()
+        if expected_output != warning:
             return CheckResult.wrong(f"The program did not warn about a short password.")
 
         return CheckResult.correct()
@@ -39,9 +39,9 @@ class StageTest4(StageTest):
 
         expected_output = "Your hashed password is: " + expected_hash
 
-        display_hash_output = output.split("\n")[0]
+        display_hash_output = output.split("\n")[0].strip()
 
-        if expected_output != display_hash_output.strip():
+        if expected_output != display_hash_output:
             return CheckResult.wrong("The program should output the hashed password.\n" +
                                      "Expected: \"" + expected_output + "\".\n" +
                                      "Got: \"" + display_hash_output + "\". ")
