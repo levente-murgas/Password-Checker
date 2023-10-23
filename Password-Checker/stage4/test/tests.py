@@ -1,5 +1,5 @@
 from hstest import CheckResult, StageTest, dynamic_test, TestedProgram
-import hashlib
+import hashlib, requests
 
 
 class StageTest4(StageTest):
@@ -14,6 +14,7 @@ class StageTest4(StageTest):
 
     valid_pwds = ["mypassword123", "youcantguessme", "abcdefgh", "validpwd"]
     short_pwds = ["123456", "qwerty", "qwertz", "notlong", "short"]
+
     @dynamic_test(data=short_pwds)
     def short_pwd_length_check(self, x):
         main = TestedProgram()
@@ -45,6 +46,7 @@ class StageTest4(StageTest):
                                      "Expected: \"" + expected_output + "\".\n" +
                                      "Got: \"" + display_hash_output + "\". ")
         return CheckResult.correct()
+
     @dynamic_test(data=valid_pwds)
     def test_api_request(self, x):
         main = TestedProgram()
@@ -59,6 +61,28 @@ class StageTest4(StageTest):
         sha1_hash = hashlib.sha1(x.encode()).hexdigest().lower()
         if sha1_hash[:5] not in output:
             return CheckResult.wrong("The URL did not contain the correct first 5 characters of the hashed password.")
+
+        return CheckResult.correct()
+
+    @dynamic_test(data=valid_pwds)
+    def test_api_request(self, x):
+        main = TestedProgram()
+        main.start().lower()
+
+        output = main.execute(x).strip()
+        output = output.split("Checking...")[1].strip()
+
+        sha1_hash = hashlib.sha1(x.encode()).hexdigest().lower()
+
+        response = requests.get("https://api.pwnedpasswords.com/range/" + sha1_hash[0:5])
+        lines = response.text.splitlines()
+
+        expected_output = "The request returned " + str(len(lines)) + " possibly matching passwords."
+        # Add a check to verify that some fetched data is printed
+        if expected_output != output:
+            return CheckResult.wrong(f"The number of possible matches is not equal to the expected number of matches.\n"
+                                     f"Your output: {output}\n"
+                                     f"Expected: {expected_output}")
 
         return CheckResult.correct()
 
