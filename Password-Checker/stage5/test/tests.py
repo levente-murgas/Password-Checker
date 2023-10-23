@@ -3,7 +3,7 @@ import hashlib, requests
 
 
 class StageTest5(StageTest):
-    valid_pwds = ["mypassword123", "youcantguessme", "abcdefgh", "validpwd"]
+    valid_pwds = ["mypassword123", "youcantguessme", "abcdefgh", "validpwd", "adefkfnreogbroegbroegb", "wfwbfodbuoadbcuodavc"]
     pwned_pwds = ["12345678", "password", "mypassword"]
     short_pwds = ["123456", "qwerty", "qwertz", "notlong", "short"]
     @dynamic_test(data=short_pwds)
@@ -29,16 +29,21 @@ class StageTest5(StageTest):
         return CheckResult.correct()
 
     @dynamic_test(data=valid_pwds)
-    def test_output_hash(self, x):
+    def hash_output_test(self, x):
         main = TestedProgram()
         main.start().lower()
-        output = main.execute(x).lower()
+        output = main.execute(x).strip()
 
-        sha1_hash = hashlib.sha1(x.encode()).hexdigest().lower()
+        expected_hash = hashlib.sha1(x.encode()).hexdigest()
 
-        if sha1_hash not in output:
-            return CheckResult.wrong(f"The program should display the hashed password ({sha1_hash}).")
+        expected_output = "Your hashed password is: " + expected_hash
 
+        display_hash_output = output.split("\n")[0].strip()
+
+        if expected_output != display_hash_output:
+            return CheckResult.wrong("The program should output the hashed password.\n" +
+                                     "Expected: \"" + expected_output + "\".\n" +
+                                     "Got: \"" + display_hash_output + "\". ")
         return CheckResult.correct()
 
     @dynamic_test(data=pwned_pwds)
@@ -46,22 +51,37 @@ class StageTest5(StageTest):
         main = TestedProgram()
         main.start().lower()
         output = main.execute(x)
+        output = output.split("Checking...")[1].strip()
 
         sha1_hash = hashlib.sha1(x.encode()).hexdigest().lower()
 
         response = requests.get("https://api.pwnedpasswords.com/range/" + sha1_hash[0:5],
                                 headers={"Add-Padding": "true"})
         results = response.text.split("\n")
+
         found = False
+        final_count = 0
         for result in results:
             hash_suffix, count = result.lower().strip().split(":")
             if hash_suffix == sha1_hash[5:]:
                 found = True
-                if str(count) not in output:
-                    return CheckResult.wrong(
-                        "This password has been pwned " + count + " times, but your output is: \n" + output)
-                else:
-                    return CheckResult.correct()
+                final_count = count
+                break
+
+        if found:
+            expected_output = f"Your password has been pwned! The password \"{x}\" appears {final_count} times in data breaches."
+            if expected_output != output:
+                return CheckResult.wrong(
+                    "This password has been pwned " + final_count + " times, but your output was: \n" + output)
+            else:
+                return CheckResult.correct()
+        else:
+            expected_output = "Good news! Your password hasn't been pwned."
+            if expected_output != output:
+                return CheckResult.wrong(
+                    "This password hasn't been pwned, but your output was: \n" + output)
+            else:
+                return CheckResult.correct()
 
 
 if __name__ == '__main__':

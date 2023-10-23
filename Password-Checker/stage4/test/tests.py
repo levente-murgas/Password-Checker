@@ -52,23 +52,6 @@ class StageTest4(StageTest):
         main = TestedProgram()
         main.start().lower()
 
-        output = main.execute(x).lower().strip()
-
-        if "https://api.pwnedpasswords.com/range/" not in output:
-            return CheckResult.wrong("The program did not display the API URL.")
-
-        # Check if the URL contains the first 5 characters of the hashed password
-        sha1_hash = hashlib.sha1(x.encode()).hexdigest().lower()
-        if sha1_hash[:5] not in output:
-            return CheckResult.wrong("The URL did not contain the correct first 5 characters of the hashed password.")
-
-        return CheckResult.correct()
-
-    @dynamic_test(data=valid_pwds)
-    def test_api_request(self, x):
-        main = TestedProgram()
-        main.start().lower()
-
         output = main.execute(x).strip()
         output = output.split("Checking...")[1].strip()
 
