@@ -18,6 +18,9 @@ class StageTest1(StageTest):
         output = main.start().lower()
         output2 = main.execute(x)
 
+        if not output2.strip():
+            return CheckResult.wrong("Your program's output is empty. It should display the entered password.")
+
         if x not in output2:
             return CheckResult.wrong("Your program should display the entered password, " +
                                      "which is: \"" + x + "\". Meanwhile, your output is: " + output2)
