@@ -1,4 +1,15 @@
 from hstest import CheckResult, StageTest, dynamic_test, TestedProgram
+import random
+
+
+def generate_data():
+    data_arr = []
+    for i in range(5):
+        number_of_short_pwds = random.randint(1, 10)
+        data = [f"short{i}" for i in range(number_of_short_pwds)]
+        data.append("validpassword")
+        data_arr.append(data)
+    return data_arr
 
 
 class StageTest2(StageTest):
@@ -12,6 +23,7 @@ class StageTest2(StageTest):
 
     valid_pwds = ["mypassword123", "youcantguessme", "abcdefgh", "validpwd"]
     short_pwds = ["123456", "qwerty", "qwertz", "notlong", "short"]
+
 
     @dynamic_test(data=valid_pwds)
     def input_test(self, x):
@@ -55,17 +67,25 @@ class StageTest2(StageTest):
 
         return CheckResult.correct()
 
-    @dynamic_test(data=short_pwds)
-    def prompt_again_check(self, x):
+    @dynamic_test(data=generate_data())
+    def prompt_again_check_2(self, *args):
         main = TestedProgram()
         main.start().lower()
-        output = main.execute(x) #short password is passed
-        if "password" not in output:
-            return CheckResult.wrong("The program did not ask for the password again " +
-                                     "after a short one.")
-        elif main.is_finished():
-            return CheckResult.wrong("The program finished without asking for a password again " +
-                                     "after a short one.")
+
+        for arg in args[:-1]:  # Passing all but the last password
+            main.execute(arg)
+            if main.is_finished():
+                return CheckResult.wrong("The program finished without asking for a password again after a short one.")
+
+        # Now pass the valid password
+        output = main.execute(args[-1]).strip()
+
+        expected_output = "You entered: " + args[-1]
+
+        if expected_output != output:
+            return CheckResult.wrong(f"The program did not confirm that a valid password was entered.\n"
+                                     f"Your output was: {output}")
+
         return CheckResult.correct()
 
 
