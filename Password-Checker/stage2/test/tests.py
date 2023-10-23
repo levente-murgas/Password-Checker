@@ -31,7 +31,7 @@ class StageTest2(StageTest):
         main.start().lower()
         output = main.execute(x)
 
-        if "Your password is too short. Please eter a password of at least 8 characters." not in output:
+        if "Your password is too short. Please enter a password of at least 8 characters." not in output:
             return CheckResult.wrong("The program did not warn about a short password.")
 
         return CheckResult.correct()
